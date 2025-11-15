@@ -2,8 +2,10 @@
 
 # react雛形作成
 注意：nodeのバージョンは18までであること
-### `npx create-react-app プロジェクト名`
-### `npx create-react-app project-list`
+```
+npx create-react-app プロジェクト名
+npx create-react-app project-list
+```
 
 「Happy hacking!」と出力されたらOK
 project-listディレクトリが作成されたことを確認する
