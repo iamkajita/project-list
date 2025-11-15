@@ -9,7 +9,8 @@ const Login = ({ onLogin }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const API_URL = 'http://localhost:3001/api';
+  // 環境変数から取得（本番ではRenderのURL、開発ではlocalhost）
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,7 +19,7 @@ const Login = ({ onLogin }) => {
 
     try {
       const endpoint = isRegister ? '/register' : '/login';
-      const response = await axios.post(`${API_URL}${endpoint}`, {
+      const response = await axios.post(`${API_URL}/api${endpoint}`, {
         username,
         password
       });
