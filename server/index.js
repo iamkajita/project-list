@@ -48,7 +48,7 @@ app.post('/api/register', async (req, res) => {
     
     res.status(201).json({ message: 'ユーザー登録が完了しました', userId: result.rows[0].id });
   } catch (error) {
-    if (error.code === '23505') { // PostgreSQLのUNIQUEエラーコード
+    if (error.code === '23505') {
       return res.status(400).json({ error: 'このユーザー名は既に使用されています' });
     }
     res.status(500).json({ error: 'ユーザー登録に失敗しました' });
@@ -136,20 +136,3 @@ app.delete('/api/projects/:id', authenticateToken, async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-```
-
-### 5. **主な変更点**
-
-- `db.run` → `pool.query` (await必須)
-- `db.get` → `pool.query` で `result.rows[0]`
-- `db.all` → `pool.query` で `result.rows`
-- `?` プレースホルダー → `$1, $2, $3...`
-- `completed ? 1 : 0` → `completed` (PostgreSQLはBOOLEAN型)
-
-### 6. **ローカルでテスト（オプション）**
-
-PostgreSQLをローカルにインストールしていない場合は、`.env`を以下のように：
-```
-JWT_SECRET=WIDdFICMMgNKe9DWyCqZxWLQwlbU2Uufmps1BbbazL0=
-VITE_API_URL=http://localhost:3001
-# DATABASE_URLは本番環境でのみ設定
