@@ -102,3 +102,30 @@
 .projects-section {
   margin-top: 24px;
 }
+
+
+/* ユーザー情報 */
+.user-info {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info span {
+  font-weight: bold;
+  color: #374151;
+}
+
+.btn-secondary {
+  background: #6b7280;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #4b5563;
+}

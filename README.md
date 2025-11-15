@@ -1,7 +1,7 @@
 ## プロジェクト作成方法
 
 # react雛形作成
-注意：nodeのバージョンは18までであること
+・nodeのバージョンは18
 ```
 npx create-react-app プロジェクト名
 npx create-react-app project-list
@@ -10,6 +10,29 @@ npx create-react-app project-list
 「Happy hacking!」と出力されたらOK
 project-listディレクトリが作成されたことを確認する
 
+# 起動
+`npm run dev:full`
+
+### DB追加
+# package.jsonを修正
+'''
+  # 修正前
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  
+  # 修正後
+  "scripts": {
+    "dev": "vite",
+    "server": "nodemon server/index.js",
+    "dev:full": "concurrently \"npm run dev\" \"npm run server\"",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+'''
 
 # Getting Started with Create React App
 

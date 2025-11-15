@@ -3,9 +3,6 @@ import '../css/Project.css';
 
 const Project = ({ project, toggleProject, updatePreference, deleteProject }) => {
 
-    const handleProjectClick = () => {
-        toggleProject(project.id);
-    };
 
     const handlePreferenceChange = (e) => {
         updatePreference(project.id, parseInt(e.target.value));

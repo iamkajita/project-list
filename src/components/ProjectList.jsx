@@ -10,11 +10,10 @@ const ProjectList = ({projects, toggleProject, updatePreference, deleteProject})
       </div>
     );
   }
-  const sortedProjects = [...projects].reverse();
 
   return (
     <div className="project-list-container">
-      {sortedProjects.map((project) => (
+      {projects.map((project) => (
         <Project 
           project={project} 
           key={project.id} 

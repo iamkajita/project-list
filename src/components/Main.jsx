@@ -1,69 +1,141 @@
-import React from "react";
-import { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 import ProjectList from './ProjectList';
+import Header from './Header';
 import '../css/Main.css';
 
 const Main = () => {
-    const [projects, setProjects] = useState([
-        { id: 1, name: 'Project A', completed: false, content: 'Content for Project A', preference: 0 }
-    ]);
-
+    const [projects, setProjects] = useState([]);
     const projectNameRef = useRef();
     const projectContentRef = useRef();
 
-    const handleAddProject = () => {
+    const API_URL = 'http://localhost:3001/api';
+    const token = localStorage.getItem('token');
+
+    useEffect(() => {
+        fetchProjects();
+    }, []);
+
+    const fetchProjects = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/projects`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setProjects(response.data);
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+        }
+    };
+
+    const handleAddProject = async () => {
         const name = projectNameRef.current.value;
         const content = projectContentRef.current.value;
         
         if (name === '') return;
-        
-        setProjects((prevProjects) => {
-            return [...prevProjects, { 
-                id: uuidv4(), 
-                name: name, 
-                content: content,
-                completed: false,
-                preference: 0
-            }];
-        });
-        
-        projectNameRef.current.value = null;
-        projectContentRef.current.value = null;
-    }
 
-    const toggleProject = (id) => {
-        const newProjects = [...projects];
-        const project = newProjects.find((project) => project.id === id);
-        project.completed = !project.completed;
-        setProjects(newProjects);
+        const newProject = {
+            id: uuidv4(),
+            name,
+            content,
+            preference: 0,
+            completed: false
+        };
+
+        try {
+            await axios.post(`${API_URL}/projects`, newProject, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            setProjects([newProject, ...projects]);
+            projectNameRef.current.value = '';
+            projectContentRef.current.value = '';
+        } catch (error) {
+            console.error('Error adding project:', error);
+            alert('案件の追加に失敗しました');
+        }
     };
 
-    const updatePreference = (id, preference) => {
-        const newProjects = projects.map((project) => 
-            project.id === id ? { ...project, preference } : project
-        );
-        setProjects(newProjects);
+    const toggleProject = async (id) => {
+        const project = projects.find(p => p.id === id);
+        const updated = { ...project, completed: !project.completed };
+
+        try {
+            await axios.put(`${API_URL}/projects/${id}`, {
+                preference: updated.preference,
+                completed: updated.completed
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            setProjects(projects.map(p => p.id === id ? updated : p));
+        } catch (error) {
+            console.error('Error updating project:', error);
+        }
     };
 
-    // 追加: 個別のプロジェクトを削除する関数
-    const deleteProject = (id) => {
-        const newProjects = projects.filter((project) => project.id !== id);
-        setProjects(newProjects);
+    const updatePreference = async (id, preference) => {
+        const project = projects.find(p => p.id === id);
+
+        try {
+            await axios.put(`${API_URL}/projects/${id}`, {
+                preference,
+                completed: project.completed
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            setProjects(projects.map(p => p.id === id ? { ...p, preference } : p));
+        } catch (error) {
+            console.error('Error updating preference:', error);
+        }
+    };
+
+    const deleteProject = async (id) => {
+        try {
+            await axios.delete(`${API_URL}/projects/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            setProjects(projects.filter(p => p.id !== id));
+        } catch (error) {
+            console.error('Error deleting project:', error);
+        }
     };
 
     const handleClear = () => {
-        const newProjects = projects.filter((project) => !project.completed);
-        setProjects(newProjects);
+        const toDelete = projects.filter(p => p.completed);
+        
+        Promise.all(
+            toDelete.map(p => 
+                axios.delete(`${API_URL}/projects/${p.id}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+            )
+        ).then(() => {
+            setProjects(projects.filter(p => !p.completed));
+        }).catch(error => {
+            console.error('Error clearing projects:', error);
+        });
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        window.location.reload();
     };
 
     return (
         <div className="main-container">
             <div className="content-wrapper">
-                <div className="header-card">
-                    <h1>案件提案システム</h1>
-                    <p>案件を管理して、希望度を評価しましょう</p>
+                <div className="user-info">
+                    <span>ログイン中: {localStorage.getItem('username')}</span>
+                    <button onClick={handleLogout} className="btn btn-secondary btn-small">
+                        ログアウト
+                    </button>
                 </div>
+
+                <Header />
 
                 <div className="form-card">
                     <div className="form-group">
@@ -72,7 +144,7 @@ const Main = () => {
                             type="text" 
                             ref={projectNameRef} 
                             className="form-input"
-                            placeholder="例: Webシステム開発"
+                            placeholder="例: 大手通信会社のWebシステム開発"
                         />
                     </div>
                     
@@ -90,7 +162,7 @@ const Main = () => {
                             onClick={handleAddProject}
                             className="btn btn-primary"
                         >
-                            ➕ 追加
+                            ➕ プロジェクトを追加
                         </button>
                     </div>
                 </div>
@@ -100,7 +172,7 @@ const Main = () => {
                         projects={projects} 
                         toggleProject={toggleProject}
                         updatePreference={updatePreference}
-                        deleteProject={deleteProject}  // 追加
+                        deleteProject={deleteProject}
                     />
                 </div>
             </div>
