@@ -1,6 +1,9 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 
+console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+console.log('DATABASE_URL starts with postgres:', process.env.DATABASE_URL?.startsWith('postgres'));
+
 // 環境に応じた接続設定
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/projectlist',
