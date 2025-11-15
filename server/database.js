@@ -1,16 +1,14 @@
 import pkg from 'pg';
 const { Pool } = pkg;
 
-// 環境に応じた接続設定
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/projectlist',
+  connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
-// テーブル初期化
+// テーブル作成
 const initDatabase = async () => {
   try {
-    // usersテーブル
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -20,7 +18,6 @@ const initDatabase = async () => {
       )
     `);
 
-    // projectsテーブル
     await pool.query(`
       CREATE TABLE IF NOT EXISTS projects (
         id TEXT PRIMARY KEY,
