@@ -10,7 +10,7 @@ const Main = () => {
     const projectNameRef = useRef();
     const projectContentRef = useRef();
 
-    const API_URL = 'http://localhost:3001/api';
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
     const token = localStorage.getItem('token');
 
     useEffect(() => {
@@ -19,7 +19,7 @@ const Main = () => {
 
     const fetchProjects = async () => {
         try {
-            const response = await axios.get(`${API_URL}/projects`, {
+            const response = await axios.get(`${API_URL}/api/projects`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setProjects(response.data);
@@ -43,7 +43,7 @@ const Main = () => {
         };
 
         try {
-            await axios.post(`${API_URL}/projects`, newProject, {
+            await axios.post(`${API_URL}/api/projects`, newProject, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -61,7 +61,7 @@ const Main = () => {
         const updated = { ...project, completed: !project.completed };
 
         try {
-            await axios.put(`${API_URL}/projects/${id}`, {
+            await axios.put(`${API_URL}/api/projects/${id}`, {
                 preference: updated.preference,
                 completed: updated.completed
             }, {
@@ -78,7 +78,7 @@ const Main = () => {
         const project = projects.find(p => p.id === id);
 
         try {
-            await axios.put(`${API_URL}/projects/${id}`, {
+            await axios.put(`${API_URL}/api/projects/${id}`, {
                 preference,
                 completed: project.completed
             }, {
@@ -93,7 +93,7 @@ const Main = () => {
 
     const deleteProject = async (id) => {
         try {
-            await axios.delete(`${API_URL}/projects/${id}`, {
+            await axios.delete(`${API_URL}/api/projects/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -108,7 +108,7 @@ const Main = () => {
         
         Promise.all(
             toDelete.map(p => 
-                axios.delete(`${API_URL}/projects/${p.id}`, {
+                axios.delete(`${API_URL}/api/projects/${p.id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 })
             )

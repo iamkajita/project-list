@@ -3,6 +3,7 @@ const { Pool } = pkg;
 
 console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
 console.log('DATABASE_URL starts with postgres:', process.env.DATABASE_URL?.startsWith('postgres'));
+console.log('NODE_ENV:', process.env.NODE_ENV);
 
 // 環境に応じた接続設定
 const pool = new Pool({
@@ -12,8 +13,9 @@ const pool = new Pool({
 
 // テーブル初期化
 const initDatabase = async () => {
+  console.log('Starting database initialization...');
   try {
-    // usersテーブル
+    console.log('Creating users table...');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -22,8 +24,9 @@ const initDatabase = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+    console.log('Users table created');
 
-    // projectsテーブル
+    console.log('Creating projects table...');
     await pool.query(`
       CREATE TABLE IF NOT EXISTS projects (
         id TEXT PRIMARY KEY,
@@ -36,10 +39,13 @@ const initDatabase = async () => {
         FOREIGN KEY (user_id) REFERENCES users (id)
       )
     `);
+    console.log('Projects table created');
 
     console.log('Database initialized successfully');
   } catch (error) {
     console.error('Database initialization error:', error);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
   }
 };
 
